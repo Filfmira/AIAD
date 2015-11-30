@@ -1,0 +1,2 @@
+exemplo argumentos:
+-gui equipment1:hospital.agents.EquipmentAgent(treatment-1);patient1:hospital.agents.PatientAgent(patology-1,1)
