@@ -74,9 +74,15 @@ public class EquipmentAgent extends Agent{
 
 	public void setCurrentPatient(AID currentPatient) {
 		this.currentPatient = currentPatient;
+		this.subscribedPatients.remove(currentPatient);
 	}
 	
 	public List<AID> getSubscribedPatients() {
 		return subscribedPatients;
 	}
+
+	public Treatment getTreatment() {
+		return treatment;
+	}
+
 }

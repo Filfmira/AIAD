@@ -1,6 +1,7 @@
 package hospital.agents;
 
 import hospital.Patologies;
+import hospital.Treatment;
 import hospital.Treatments;
 import hospital.agents.behaviours.BasePatientBehaviour;
 import hospital.agents.behaviours.EquipmentSubscriptionBehaviour;
@@ -9,9 +10,11 @@ import jade.core.Agent;
 public class PatientAgent extends Agent{
 
 	private String patology;
-	private Treatments treatment;
+	private Treatments treatments;
 	private int priority;
-
+	private int nextTreatmentIndex = 0; //inicialmente vai assumir ordem obrigatória nos tratamentos
+	private boolean isInTreatment = false;
+	
 	protected void setup() {
 		// Printout a welcome message
 		System.out.println("Hello! Patient-agent " + getAID().getName() + " is ready.");
@@ -23,9 +26,9 @@ public class PatientAgent extends Agent{
 			System.out.println("Patient patology is "+this.patology);
 			
 			this.priority = Integer.parseInt((String) args[1]);
-			this.treatment = Patologies.get(this.patology);
+			this.treatments = Patologies.get(this.patology);
 			
-			if(this.treatment == null){
+			if(this.treatments == null){
 				// Make the agent terminate
 				System.out.println("No treatment for patology: " + this.patology);
 				doDelete();
@@ -49,7 +52,39 @@ public class PatientAgent extends Agent{
 	}
 	
 	public Treatments getTreatment() {
-		return treatment;
+		return treatments;
+	}
+
+	public boolean isInTreatment() {
+		return isInTreatment;
+	}
+
+	public void setInTreatment(boolean isInTreatment) {
+		this.isInTreatment = isInTreatment;
+		this.nextTreatment();
+	}
+	
+	public void nextTreatment(){
+		this.nextTreatmentIndex++;
+		this.isInTreatment = false;
+		if(this.nextTreatmentIndex == this.treatments.getTreatments().size()){
+			System.out.println("######################################");
+			System.out.println("Patient " + this.getName() + " ended all treatments. Killing...");
+			System.out.println("######################################");
+			this.takeDown();
+		}		
+	}
+	
+	public Treatment getNextTreatment(){
+		return this.treatments.getTreatments().get(this.nextTreatmentIndex);
+	}
+
+	public int getPriority() {
+		return priority;
+	}
+
+	public void setPriority(int priority) {
+		this.priority = priority;
 	}
 
 	

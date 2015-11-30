@@ -26,6 +26,7 @@ public class BaseEquipmentBehaviour extends Behaviour {
 	private int proposalsSent; //number of Patients that CFP was sent to
 
 	private List<AID> proposalsReceivedAIDs = new ArrayList<AID>();
+	private int cfpResponsesReceived = 0;
 	private AID bestProposalAID = null;
 	private int bestProposal = 0;
 	
@@ -49,11 +50,12 @@ public class BaseEquipmentBehaviour extends Behaviour {
 			bestProposal = 0;
 			bestProposalAID = null;
 			proposalsReceivedAIDs = new ArrayList<AID>();
+			cfpResponsesReceived = 0;
 			this.state++;
 			break;
 		case 1:
 			receiveProposal();
-			if(this.proposalsReceivedAIDs.size() == this.proposalsSent)
+			if(this.cfpResponsesReceived == this.proposalsSent)
 				this.state++;
 			break;
 		case 2:
@@ -85,12 +87,13 @@ public class BaseEquipmentBehaviour extends Behaviour {
 			if(msg.getSender() == this.bestProposalAID)
 				if(msg.getPerformative() == ACLMessage.INFORM){
 					this.acceptedByPatient = true;
+					((EquipmentAgent) myAgent).setCurrentPatient(msg.getSender());
 				}
 			this.finalAnswersReceived++;
 		}
 		else {
 			block();
-		}		
+		}
 	}
 
 	private void sendProposalResponses() {
@@ -98,7 +101,7 @@ public class BaseEquipmentBehaviour extends Behaviour {
 		ACLMessage reject = new ACLMessage(ACLMessage.REJECT_PROPOSAL);
 		
 		for (int j = 0; j < this.proposalsReceivedAIDs.size(); j++) {
-			if(this.proposalsReceivedAIDs.get(j) != this.bestProposalAID)
+			if(this.proposalsReceivedAIDs.get(j).equals(this.bestProposalAID))
 				reject.addReceiver(this.proposalsReceivedAIDs.get(j));
 		}
 		reject.setConversationId("auction-equipment-usage");
@@ -116,13 +119,18 @@ public class BaseEquipmentBehaviour extends Behaviour {
 	private void receiveProposal() {
 		ACLMessage msg = myAgent.receive(mt);
 		if (msg != null) {
-			
-			int proposal = Integer.parseInt(msg.getContent());
-			if(proposal > this.bestProposal){
-				this.bestProposal = proposal;
-				this.bestProposalAID = msg.getSender();
+			if(msg.getPerformative() == ACLMessage.REFUSE){
+				cfpResponsesReceived++;
 			}
-			this.proposalsReceivedAIDs.add(msg.getSender());
+			else if (msg.getPerformative() == ACLMessage.PROPOSE){
+				int proposal = Integer.parseInt(msg.getContent());
+				if(proposal > this.bestProposal){
+					this.bestProposal = proposal;
+					this.bestProposalAID = msg.getSender();
+				}
+				this.proposalsReceivedAIDs.add(msg.getSender());
+				cfpResponsesReceived++;
+			}
 		}
 		else {
 			block();
@@ -142,7 +150,7 @@ public class BaseEquipmentBehaviour extends Behaviour {
 			cfp.addReceiver(patients.get(i));
 		}
 		this.proposalsSent = patients.size();
-		cfp.setContent("");
+		cfp.setContent(((EquipmentAgent) myAgent).getTreatment().getName());
 		cfp.setConversationId("auction-equipment-usage");
 		myAgent.send(cfp);
 	}
