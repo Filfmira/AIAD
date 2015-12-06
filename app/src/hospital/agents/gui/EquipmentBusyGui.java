@@ -35,6 +35,7 @@ public class EquipmentBusyGui extends JFrame {
 				}
 			}
 		} );
+		finishButton.setPreferredSize(new Dimension(300,100));
 		p.add(finishButton, BorderLayout.SOUTH);
 
 		this.add(p);
@@ -56,6 +57,7 @@ public class EquipmentBusyGui extends JFrame {
 		int centerX = (int)screenSize.getWidth() / 2;
 		int centerY = (int)screenSize.getHeight() / 2;
 		setLocation(centerX - getWidth() / 2, centerY - getHeight() / 2);
+		this.setSize(new Dimension(300,150));
 		super.setVisible(true);
 	}	
 }

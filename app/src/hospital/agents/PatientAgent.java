@@ -67,26 +67,22 @@ public class PatientAgent extends Agent{
 
 	public void setInTreatment(boolean isInTreatment) {
 		if(isInTreatment){ //if setting to true
-			this.nextTreatment();
+			this.nextTreatmentIndex++;
 			this.addBehaviour(new InTreatmentBehaviour(this)); 
 		}
-		else if(this.nextTreatmentIndex + 1 == this.treatments.getTreatments().size()) //if last treatment over, force next treatment
-			this.nextTreatment();
-		this.isInTreatment = isInTreatment;
-	}
-	
-	public void nextTreatment(){
-		this.nextTreatmentIndex++;
-		this.isInTreatment = false;
-		if(this.nextTreatmentIndex == this.treatments.getTreatments().size()){
+		else if(this.nextTreatmentIndex + 1 == this.treatments.getTreatments().size()){ //if last treatment over, force next treatment
 			System.out.println("######################################");
 			System.out.println("Patient " + this.getName() + " ended all treatments. Killing...");
 			System.out.println("######################################");
 			this.takeDown();
-		}		
+		}
+		this.isInTreatment = isInTreatment;
 	}
+
 	
 	public Treatment getNextTreatment(){
+		if(this.nextTreatmentIndex == this.treatments.getTreatments().size())
+			return null;
 		return this.treatments.getTreatments().get(this.nextTreatmentIndex);
 	}
 

@@ -1,5 +1,6 @@
 package hospital.agents.behaviours;
 
+import hospital.Treatment;
 import hospital.agents.PatientAgent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
@@ -71,7 +72,10 @@ public class BasePatientBehaviour extends Behaviour {
 		//receive 
 		ACLMessage msg = myAgent.receive(mt);
 		if (msg != null) {
-			String nextTreatment = ((PatientAgent) myAgent).getNextTreatment().getName();
+			Treatment treatment = ((PatientAgent) myAgent).getNextTreatment();
+			if (treatment == null)
+				return;
+			String nextTreatment = treatment.getName();
 			
 			// check if next treatment is the same as the received CFP 
 			if(nextTreatment.equals(msg.getContent())){
