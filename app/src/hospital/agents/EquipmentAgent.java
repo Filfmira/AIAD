@@ -7,14 +7,22 @@ import hospital.Treatment;
 import hospital.Treatments;
 import hospital.agents.behaviours.BaseEquipmentBehaviour;
 import hospital.agents.behaviours.SubscriptionHandlerBehaviour;
+import hospital.agents.gui.EquipmentBusyGui;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 public class EquipmentAgent extends Agent{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	private String name;
 	private List<AID> subscribedPatients = new ArrayList<AID>();
@@ -22,6 +30,8 @@ public class EquipmentAgent extends Agent{
 
 	private Treatment treatment; 
 	private AID currentPatient = null;
+	
+	private EquipmentBusyGui busyGui;
 	
 	// Put agent initializations here
 	protected void setup() {
@@ -85,4 +95,24 @@ public class EquipmentAgent extends Agent{
 		return treatment;
 	}
 
+	public void startBaseBehaviour() {
+
+	}
+	
+	public void startGui(){
+		this.busyGui = new EquipmentBusyGui(this);
+		this.busyGui.showGui();
+	}
+
+	public void finishTreatment() {
+		this.busyGui.dispose();
+		
+		ACLMessage end_treatment = new ACLMessage(ACLMessage.INFORM);
+		end_treatment.addReceiver(this.currentPatient);
+		end_treatment.setConversationId("treatment-ended");
+		this.send(end_treatment);
+
+		this.currentPatient = null;
+		//addBehaviour(new BaseEquipmentBehaviour(this));
+	}
 }

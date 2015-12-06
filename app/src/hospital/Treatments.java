@@ -29,6 +29,8 @@ public class Treatments {
 	
 	private static Hashtable<String,Treatment> treatments = new Hashtable<String,Treatment>()
 	{
+		private static final long serialVersionUID = -3925047417496743063L;
+
 		{ 
 			put("treatment-1", new Treatment("treatment-1", 10));
 			put("treatment-2", new Treatment("treatment-2", 15));

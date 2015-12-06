@@ -1,6 +1,5 @@
 package hospital.agents.behaviours;
 
-import hospital.agents.EquipmentAgent;
 import hospital.agents.PatientAgent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
@@ -8,11 +7,15 @@ import jade.lang.acl.MessageTemplate;
 
 public class BasePatientBehaviour extends Behaviour {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private MessageTemplate mt; // The template to receive CFP
 	private int state = 0;
 
 	public BasePatientBehaviour(PatientAgent a) {
-		// TODO Auto-generated constructor stub
 		myAgent = a;
 	}
 
@@ -48,7 +51,6 @@ public class BasePatientBehaviour extends Behaviour {
 				ACLMessage cfp = new ACLMessage(ACLMessage.INFORM);
 				cfp.setReplyWith(msg.getReplyWith()); // Unique value
 				cfp.addReceiver(msg.getSender());
-				cfp.setConversationId("auction-equipment-usage");
 				myAgent.send(cfp);
 				this.state++;
 			}
@@ -78,20 +80,19 @@ public class BasePatientBehaviour extends Behaviour {
 				cfp.setReplyWith(msg.getReplyWith()); // Unique value
 				cfp.addReceiver(msg.getSender());
 				cfp.setContent(Integer.toString(((PatientAgent) myAgent).getPriority()));
-				cfp.setConversationId("auction-equipment-usage");
 				myAgent.send(cfp);
 				this.state++;
-				mt = MessageTemplate.and(MessageTemplate.MatchReplyWith(msg.getReplyWith()),
-						MessageTemplate.MatchConversationId("auction-equipment-usage"));
+				mt = MessageTemplate.MatchReplyWith(msg.getReplyWith());
+				System.out.println(" ## sent propose to " + msg.getSender().getLocalName() + " reply with: #"+msg.getReplyWith()+"#");
 			}
 			else{
 				// send REFFUSE
 				ACLMessage cfp = new ACLMessage(ACLMessage.REFUSE);
 				cfp.setReplyWith(msg.getReplyWith()); // Unique value
 				cfp.addReceiver(msg.getSender());
-				cfp.setConversationId("auction-equipment-usage");
 				myAgent.send(cfp);
 				this.state = 0;
+				System.out.println(" ## sent refuse to " + msg.getSender().getLocalName());
 			}
 		}
 		else {
@@ -101,8 +102,7 @@ public class BasePatientBehaviour extends Behaviour {
 	}
 	
 	private void initialize() {
-		mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.CFP),
-				MessageTemplate.MatchConversationId("auction-equipment-usage"));		
+		mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);		
 	}
 
 	@Override

@@ -30,6 +30,11 @@ import javax.swing.*;
   @author Giovanni Caire - TILAB
  */
 class BookSellerGui extends JFrame {	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3445891409281346596L;
+
 	private BookSellerAgent myAgent;
 	
 	private JTextField titleField, priceField;

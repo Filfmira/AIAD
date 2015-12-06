@@ -32,6 +32,10 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 public class BookBuyerAgent extends Agent {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	// The title of the book to buy
 	private String targetBookTitle;
 	// The list of known seller agents
@@ -50,6 +54,9 @@ public class BookBuyerAgent extends Agent {
 
 			// Add a TickerBehaviour that schedules a request to seller agents every minute
 			addBehaviour(new TickerBehaviour(this, 60000) {
+
+				private static final long serialVersionUID = 1L;
+
 				protected void onTick() {
 					System.out.println("Trying to buy '" + targetBookTitle + "'");
 					// Update the list of seller agents
@@ -94,6 +101,10 @@ public class BookBuyerAgent extends Agent {
 	   agents the target book.
 	 */
 	private class RequestPerformer extends Behaviour {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private AID bestSeller; // The agent who provides the best offer 
 		private int bestPrice;  // The best offered price
 		private int repliesCnt = 0; // The counter of replies from seller agents

@@ -5,10 +5,16 @@ import hospital.Treatment;
 import hospital.Treatments;
 import hospital.agents.behaviours.BasePatientBehaviour;
 import hospital.agents.behaviours.EquipmentSubscriptionBehaviour;
+import hospital.agents.behaviours.InTreatmentBehaviour;
 import jade.core.Agent;
 
 public class PatientAgent extends Agent{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private String patology;
 	private Treatments treatments;
 	private int priority;
@@ -60,8 +66,13 @@ public class PatientAgent extends Agent{
 	}
 
 	public void setInTreatment(boolean isInTreatment) {
+		if(isInTreatment){ //if setting to true
+			this.nextTreatment();
+			this.addBehaviour(new InTreatmentBehaviour(this)); 
+		}
+		else if(this.nextTreatmentIndex + 1 == this.treatments.getTreatments().size()) //if last treatment over, force next treatment
+			this.nextTreatment();
 		this.isInTreatment = isInTreatment;
-		this.nextTreatment();
 	}
 	
 	public void nextTreatment(){

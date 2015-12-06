@@ -15,6 +15,7 @@ import jade.lang.acl.MessageTemplate;
 
 public class EquipmentSubscriptionBehaviour extends Behaviour{
 
+	private static final long serialVersionUID = -4128873967125249267L;
 	private int repliesCnt = 0; // The counter of replies from equipment agents
 	private int equipmentAgents = 0; // The number of replies expected
 	private MessageTemplate mt; // The template to receive replies
@@ -42,14 +43,14 @@ public class EquipmentSubscriptionBehaviour extends Behaviour{
 				Treatment t = ts.get(i);
 				if(foundTreatments.get(t.getName()) == null){
 					String equipmentName = t.getName()+"-equipment";
-					System.out.println("Looking for: "+equipmentName);
+					//System.out.println("Looking for: "+equipmentName);
 					DFAgentDescription template = new DFAgentDescription();
 					ServiceDescription sd = new ServiceDescription();
 					sd.setType(equipmentName);
 					template.addServices(sd);
 					try {
 						DFAgentDescription[] result = DFService.search(myAgent, template); 
-						System.out.println("Found the following " + result.length + " " + equipmentName + " agents:");
+						//System.out.println("Found the following " + result.length + " " + equipmentName + " agents:");
 						
 						ACLMessage cfp = new ACLMessage(ACLMessage.SUBSCRIBE);
 						if(result.length > 0){
@@ -80,10 +81,11 @@ public class EquipmentSubscriptionBehaviour extends Behaviour{
 		if (reply != null) {
 			// Reply received
 			if (reply.getPerformative() == ACLMessage.AGREE) {
-				System.out.println(myAgent.getName() + " got subscribed to " + reply.getSender().getName());
+				//System.out.println(myAgent.getName() + " got subscribed to " + reply.getSender().getName());
 			}
-			else 
-				System.out.println(myAgent.getName() + " didn't subscribe to " + reply.getSender().getName());
+			else {
+				//System.out.println(myAgent.getName() + " didn't subscribe to " + reply.getSender().getName());
+			}
 			repliesCnt++;
 		}
 		else {
@@ -94,7 +96,7 @@ public class EquipmentSubscriptionBehaviour extends Behaviour{
 	
 	@Override
 	public boolean done() {
-		System.out.println("Equipment Subscription ended in agent "+myAgent.getName());
+		//System.out.println("Equipment Subscription ended in agent "+myAgent.getName());
 		return allTreatmentsNotified && repliesCnt >= equipmentAgents;
 	}
 

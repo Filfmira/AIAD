@@ -7,6 +7,8 @@ import jade.lang.acl.MessageTemplate;
 
 public class SubscriptionHandlerBehaviour extends Behaviour {
 
+	private static final long serialVersionUID = 1L;
+
 	public SubscriptionHandlerBehaviour(EquipmentAgent equipmentAgent) {
 		myAgent = equipmentAgent;
 	}
@@ -17,6 +19,7 @@ public class SubscriptionHandlerBehaviour extends Behaviour {
 		
 		ACLMessage msg = myAgent.receive(mt);
 		if (msg != null) {
+			System.out.println(" recebi subscription "+ msg.getReplyWith());
 			ACLMessage reply = msg.createReply();
 			reply.setPerformative(ACLMessage.AGREE);
 			myAgent.send(reply);
