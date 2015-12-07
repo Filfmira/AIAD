@@ -6,10 +6,11 @@ import java.util.List;
 import hospital.agents.EquipmentAgent;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-public class BaseEquipmentBehaviour extends Behaviour {
+public class BaseEquipmentBehaviour extends TickerBehaviour {
 
 	private static final long serialVersionUID = -1736761707583385302L;
 
@@ -35,17 +36,15 @@ public class BaseEquipmentBehaviour extends Behaviour {
 	private boolean acceptedByPatient = false;
 	
 	public BaseEquipmentBehaviour(EquipmentAgent equipmentAgent) {
+		super(equipmentAgent, 10000);
 		myAgent = equipmentAgent;
 		state = 0;
 	}
 
-	@Override
+	/*@Override
 	public void action() {
 		System.out.println("STATE: "+state+" -> "+myAgent.getName());
-		/*ACLMessage.CFP;
-		ACLMessage.PROPOSE; ACLMessage.REFUSE;
-		ACLMessage.ACCEPT_PROPOSAL; ACLMessage.REJECT_PROPOSAL;
-		ACLMessage.INFORM; ACLMessage.FAILURE;*/
+
 		switch(this.state){
 		case 0:
 			if( ((EquipmentAgent) myAgent).getCurrentPatient() == null &&
@@ -62,8 +61,11 @@ public class BaseEquipmentBehaviour extends Behaviour {
 			break;
 		case 1:
 			receiveProposal();
-			if(this.cfpResponsesReceived == this.proposalsSent)
-				this.state++;
+			if(this.cfpResponsesReceived == this.proposalsSent){
+				if(bestProposalAID == null)
+					this.state = 0;
+				else this.state++;
+			}
 			else System.out.println("## not enough responses " + myAgent.getLocalName());
 			break;
 		case 2:
@@ -85,7 +87,7 @@ public class BaseEquipmentBehaviour extends Behaviour {
 		}
 		
 		
-	}
+	}*/
 
 	private boolean receiveFinalResponses() {
 		MessageTemplate mt = MessageTemplate.MatchReplyWith(this.replyWith);
@@ -169,9 +171,65 @@ public class BaseEquipmentBehaviour extends Behaviour {
 		myAgent.send(cfp);
 	}
 
-	@Override
+	/*@Override
 	public boolean done() {
 		return state == 5;
+	}*/
+
+	@Override
+	protected void onTick() {
+		stateMachine();
+		
+	}
+	
+	public void stateMachine(){
+		state = 0;
+		while(state != -1){
+			
+			System.out.println("STATE: "+state+" -> "+myAgent.getName());
+			
+			switch(this.state){
+			case 0:
+				if( ((EquipmentAgent) myAgent).getCurrentPatient() == null &&
+				((EquipmentAgent) myAgent).getSubscribedPatients().size() > 0){
+					System.out.println("  ## iniciando contract net "+myAgent.getLocalName());
+					initiateContractNet();
+					bestProposal = 0;
+					bestProposalAID = null;
+					proposalsReceivedAIDs = new ArrayList<AID>();
+					cfpResponsesReceived = 0;
+					this.state++;
+				}
+				else this.state = -1;
+				break;
+			case 1:
+				receiveProposal();
+				if(this.cfpResponsesReceived == this.proposalsSent){
+					if(bestProposalAID == null)
+						this.state = -1;
+					else this.state++;
+				}
+				else System.out.println("## not enough responses " + myAgent.getLocalName());
+				break;
+			case 2:
+				acceptedByPatient = false;
+				sendProposalResponses();
+				this.state++;
+				break;
+			case 3:
+				if (receiveFinalResponses()){
+					if(acceptedByPatient)
+						this.state++;
+					else this.state = -1;
+				}
+				break;		
+			case 4:
+				((EquipmentAgent) myAgent).startGui(); //operator will have to press the button on the GUI to end treatment
+				state = -1;
+				break;
+			}
+			
+		}
 	}
 
 }
