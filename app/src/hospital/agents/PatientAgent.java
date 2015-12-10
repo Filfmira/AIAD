@@ -6,6 +6,7 @@ import hospital.Treatments;
 import hospital.agents.behaviours.BasePatientBehaviour;
 import hospital.agents.behaviours.EquipmentSubscriptionBehaviour;
 import hospital.agents.behaviours.InTreatmentBehaviour;
+import jade.core.AID;
 import jade.core.Agent;
 
 public class PatientAgent extends Agent{
@@ -20,6 +21,16 @@ public class PatientAgent extends Agent{
 	private int priority;
 	private int nextTreatmentIndex = 0; //inicialmente vai assumir ordem obrigatória nos tratamentos
 	private boolean isInTreatment = false;
+	
+	private boolean finished = false;
+	
+	// while in treatment, if patient gets hold of equipment for 
+	// the next treatment, it stores that equipment's AID
+	private AID nextTreatmentEquipment = null; 
+	
+	public boolean isFinished(){
+		return this.finished;
+	}
 	
 	protected void setup() {
 		// Printout a welcome message
@@ -52,6 +63,7 @@ public class PatientAgent extends Agent{
 	}
 	
 	// Put agent clean-up operations here
+	@Override
 	protected void takeDown() {
 		// Printout a dismissal message
 		System.out.println("Patient-agent "+getAID().getName()+" terminating.");
@@ -70,7 +82,7 @@ public class PatientAgent extends Agent{
 			this.nextTreatmentIndex++;
 			this.addBehaviour(new InTreatmentBehaviour(this)); 
 		}
-		else if(this.nextTreatmentIndex + 1 == this.treatments.getTreatments().size()){ //if last treatment over, force next treatment
+		else if(this.nextTreatmentIndex == this.treatments.getTreatments().size()){ //if last treatment over, force next treatment
 			System.out.println("######################################");
 			System.out.println("Patient " + this.getName() + " ended all treatments. Killing...");
 			System.out.println("######################################");
@@ -92,6 +104,14 @@ public class PatientAgent extends Agent{
 
 	public void setPriority(int priority) {
 		this.priority = priority;
+	}
+
+	public AID getNextTreatmentEquipment() {
+		return nextTreatmentEquipment;
+	}
+
+	public void setNextTreatmentEquipment(AID nextTreatmentEquipment) {
+		this.nextTreatmentEquipment = nextTreatmentEquipment;
 	}
 
 	

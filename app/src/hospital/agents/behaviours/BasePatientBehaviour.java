@@ -14,12 +14,13 @@ public class BasePatientBehaviour extends Behaviour {
 	private static final long serialVersionUID = 1L;
 	
 	private MessageTemplate mt; // The template to receive CFP
+	private String replyWith = "";
 	private int state = 0;
 
 	public BasePatientBehaviour(PatientAgent a) {
 		myAgent = a;
 	}
-
+	
 	@Override
 	public void action() {
 		switch(this.state){
@@ -33,17 +34,13 @@ public class BasePatientBehaviour extends Behaviour {
 		case 2:
 			receiveProposeResponse();
 			break;
-		case 3:
-			((PatientAgent) myAgent).setInTreatment(true);
-			state = 0;
-			break;
 		}
 
 	}
 
-
 	private void receiveProposeResponse() {
 		//receive 
+		mt = MessageTemplate.MatchReplyWith(replyWith);
 		ACLMessage msg = myAgent.receive(mt);
 		if (msg != null) {
 			
@@ -53,7 +50,12 @@ public class BasePatientBehaviour extends Behaviour {
 				cfp.setReplyWith(msg.getReplyWith()); // Unique value
 				cfp.addReceiver(msg.getSender());
 				myAgent.send(cfp);
-				this.state++;
+				
+				if(((PatientAgent) myAgent).isInTreatment())
+					((PatientAgent) myAgent).setNextTreatmentEquipment(msg.getSender());
+				else ((PatientAgent) myAgent).setInTreatment(true);
+				
+				this.state = 0;
 			}
 			else if(msg.getPerformative() == ACLMessage.REJECT_PROPOSAL){
 				this.state = 0;
@@ -66,30 +68,35 @@ public class BasePatientBehaviour extends Behaviour {
 	}
 
 	private void receiveCFP() {
-		if(((PatientAgent) myAgent).isInTreatment())
-			return;
-		
+		/*if(((PatientAgent) myAgent).isInTreatment())
+			return;*/
+		mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
 		//receive 
 		ACLMessage msg = myAgent.receive(mt);
 		if (msg != null) {
 			Treatment treatment = ((PatientAgent) myAgent).getNextTreatment();
-			if (treatment == null)
-				return;
-			String nextTreatment = treatment.getName();
 			
-			// check if next treatment is the same as the received CFP 
-			if(nextTreatment.equals(msg.getContent())){
-				// send PROPOSAL
-				ACLMessage cfp = new ACLMessage(ACLMessage.PROPOSE);
-				cfp.setReplyWith(msg.getReplyWith()); // Unique value
-				cfp.addReceiver(msg.getSender());
-				cfp.setContent(Integer.toString(((PatientAgent) myAgent).getPriority()));
-				myAgent.send(cfp);
-				this.state++;
-				mt = MessageTemplate.MatchReplyWith(msg.getReplyWith());
-				System.out.println(" ## sent propose to " + msg.getSender().getLocalName() + " reply with: #"+msg.getReplyWith()+"#");
+			boolean refuse = false;
+			if (treatment != null){
+				// check if next treatment is the same as the received CFP 
+				String nextTreatment = treatment.getName();
+				if(nextTreatment.equals(msg.getContent())){
+					// send PROPOSAL
+					ACLMessage cfp = new ACLMessage(ACLMessage.PROPOSE);
+					cfp.setReplyWith(msg.getReplyWith()); // Unique value
+					cfp.addReceiver(msg.getSender());
+					cfp.setContent(Integer.toString(((PatientAgent) myAgent).getPriority()));
+					myAgent.send(cfp);
+					this.state++;
+					mt = MessageTemplate.MatchReplyWith(msg.getReplyWith());
+					replyWith = msg.getReplyWith();
+					System.out.println(" ## sent propose to " + msg.getSender().getLocalName() + " reply with: #"+msg.getReplyWith()+"#");
+				}
+				else refuse = true;
 			}
-			else{
+			else refuse = true;
+			
+			if(refuse){
 				// send REFFUSE
 				ACLMessage cfp = new ACLMessage(ACLMessage.REFUSE);
 				cfp.setReplyWith(msg.getReplyWith()); // Unique value
@@ -111,8 +118,7 @@ public class BasePatientBehaviour extends Behaviour {
 
 	@Override
 	public boolean done() {
-		// TODO Auto-generated method stub
-		return false;
+		return ((PatientAgent) myAgent).isFinished();
 	}
 
 }

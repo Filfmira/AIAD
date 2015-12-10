@@ -22,7 +22,15 @@ public class InTreatmentBehaviour extends Behaviour {
 		ACLMessage msg = myAgent.receive(mt);
 		if (msg != null) {
 			System.out.println("received ended treatment no patient");
-			((PatientAgent) myAgent).setInTreatment(false);
+			if (((PatientAgent) myAgent).getNextTreatment() == null){
+				((PatientAgent) myAgent).setInTreatment(false);
+			}
+			else{
+				//if patient already as hold of next treatment's equipment
+				((PatientAgent) myAgent).setInTreatment(true);
+				((PatientAgent) myAgent).setNextTreatmentEquipment(null);
+			}
+			
 			this.ended = true;
 		}
 		else {
