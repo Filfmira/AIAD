@@ -74,8 +74,7 @@ public class BasePatientBehaviour extends Behaviour {
 	}
 
 	private void receiveCFP() {
-		/*if(((PatientAgent) myAgent).isInTreatment())
-			return;*/
+
 		mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
 		//receive 
 		ACLMessage msg = myAgent.receive(mt);
@@ -84,6 +83,8 @@ public class BasePatientBehaviour extends Behaviour {
 			
 			boolean refuse = false;
 			if (treatment != null){
+				System.out.println(myAgent.getLocalName() + "-> quero: "+treatment.getName() + ", e veio: " + msg.getContent());
+				
 				// check if next treatment is the same as the received CFP 
 				String nextTreatment = treatment.getName();
 				if(nextTreatment.equals(msg.getContent())){
