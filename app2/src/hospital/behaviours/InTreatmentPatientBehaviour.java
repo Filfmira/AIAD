@@ -39,7 +39,7 @@ public class InTreatmentPatientBehaviour extends Behaviour{
 				((Patient) myAgent).setInTreatment(true, ((Patient) myAgent).getNextTreatmentEquipment());
 				((Patient) myAgent).setNextTreatmentEquipment(null);
 			}
-			
+			((Patient) myAgent).healthImprovement(Integer.parseInt(msg.getContent()));
 			this.ended = true;
 		}
 		else {

@@ -3,6 +3,7 @@ package hospital.agents;
 import java.util.List;
 
 import hospital.Patologies;
+import hospital.TestingUtils;
 import hospital.Treatment;
 import hospital.Treatments;
 import hospital.behaviours.BasePatientBehaviour;
@@ -114,8 +115,10 @@ public class Patient extends Agent{
 		double factor = 1;
 		//System.out.println("next treatment time: "+this.getNextTreatment().getTime()*1000);
 		//System.out.println("curr treatment time left: "+this.getCurrentTreatmentExpectedTimeLeft());
-		if(this.getNextTreatment().getTime()*1000 < this.getCurrentTreatmentExpectedTimeLeft())
-			factor = factor*0.1;
+		if(TestingUtils.auctionsMindingTimeLeft){
+			if(this.getNextTreatment().getTime()*1000 < this.getCurrentTreatmentExpectedTimeLeft())
+				factor = factor*0.1;
+		}
 		
 		return this.priority*factor;
 	}
@@ -123,6 +126,7 @@ public class Patient extends Agent{
 	
 	/**
 	 * time left for current treatment to end in milis
+	 * returns negative value
 	 * @return
 	 */
 	public long getCurrentTreatmentExpectedTimeLeft(){
@@ -153,8 +157,11 @@ public class Patient extends Agent{
 			this.currentTreatmentExpectedDuration = this.treatments.getTreatments().get(nextTreatmentIndex-1).getTime();
 			this.addBehaviour(new InTreatmentPatientBehaviour(this,currentEquipment)); 			
 		}
-		else if(this.nextTreatmentIndex == this.treatments.getTreatments().size()){ //if last treatment over, force next treatment
-			this.doDelete();
+		else{ // setting to false
+			this.currentTreatmentExpectedDuration = 0;
+			if(this.nextTreatmentIndex == this.treatments.getTreatments().size()){ //if last treatment over, force next treatment
+				this.doDelete();
+			}
 		}
 		
 	}
@@ -195,9 +202,7 @@ public class Patient extends Agent{
 		return isInTreatment;
 	}
 	
-	
-	
-	
+
 	// Put agent clean-up operations here
 	@Override
 	protected void takeDown() {
@@ -211,5 +216,15 @@ public class Patient extends Agent{
 			e.printStackTrace();
 		}
 		
+	}
+
+	
+	public void healthImprovement(int healthImprovement) {
+		if (TestingUtils.healthImprovements){
+			int oldHealth = this.priority;
+			int temp = this.priority - healthImprovement;
+			this.priority = (temp < 1 ? 1 : temp);
+			System.out.println("Healt improvement in " + this.getLocalName() + "-> old: " + oldHealth + " # new: " + this.priority);
+		}		
 	}
 }

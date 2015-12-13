@@ -93,6 +93,7 @@ public class Equipment extends Agent{
 		ACLMessage end_treatment = new ACLMessage(ACLMessage.INFORM);
 		end_treatment.addReceiver(this.currentPatient);
 		end_treatment.setConversationId("treatment-ended");
+		end_treatment.setContent(Integer.toString(this.getTreatment().getHealthImprovement()));
 		this.send(end_treatment);
 
 		this.currentPatient = null;

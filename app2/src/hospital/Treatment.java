@@ -6,12 +6,14 @@ public class Treatment {
 	private String result;
 	private long time; // usual time the treatment takes, in seconds.
 	private int numberTreatmentsPerformed = 1; // number of treatments like this performed to date
+	private int healthImprovement; // health improvement a patient gets when performs this treatment
 	
-	public Treatment(String n, long time){
+	public Treatment(String n, long time, int healthImp){
 		this.name = n;
 		this.complete = false;
 		this.setResult(null);
 		this.time = time;
+		this.healthImprovement = healthImp;
 	}
 	
 	public void updateDuration(long newDuration){
@@ -44,5 +46,9 @@ public class Treatment {
 
 	public String getName() {
 		return name;
+	}
+
+	public int getHealthImprovement() {
+		return this.healthImprovement;
 	}
 }

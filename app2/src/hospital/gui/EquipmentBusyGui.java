@@ -6,10 +6,10 @@ import java.text.SimpleDateFormat;
 
 import javax.swing.*;
 
+import hospital.TestingUtils;
 import hospital.agents.Equipment;
 
 public class EquipmentBusyGui extends JFrame {	
-
 	private static final long serialVersionUID = 1L;
 	
 	private Equipment myAgent;
@@ -42,6 +42,8 @@ public class EquipmentBusyGui extends JFrame {
 		        if(timeLeft<=0)
 		        {
 		            timer.stop();
+		            if(TestingUtils.autonomousRun)
+		            	myAgent.finishTreatment();
 		        }
 		    }
 		};

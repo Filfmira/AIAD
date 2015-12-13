@@ -9,9 +9,10 @@ public class Patologies {
 			private static final long serialVersionUID = -815164009799967292L;
 
 			{ 
-				put("patology-1", new Treatments(Arrays.asList("treatment-1", "treatment-2", "treatment-3"), true)); 
+				put("patology-1", new Treatments(Arrays.asList("treatment-1", "treatment-2",  "treatment-4"), true)); 
 				put("patology-2", new Treatments(Arrays.asList("treatment-2", "treatment-3", "treatment-4"), false));
 				put("patology-3", new Treatments(Arrays.asList("treatment-3", "treatment-4", "treatment-5"), false));
+				put("patology-4", new Treatments(Arrays.asList("treatment-3", "treatment-5", "treatment-4"), false));
 			}
 		};
 		
