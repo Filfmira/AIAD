@@ -39,7 +39,7 @@ public class BaseEquipmentBehaviour extends TickerBehaviour{
 		System.out.println(myAgent.getLocalName() + " -> number of patients before while = " + patients.length);
 		long start = System.currentTimeMillis();
 		while(state != -1 && System.currentTimeMillis() - start < 5000){
-			System.out.println(" ## state in "+myAgent.getLocalName() + ": "+this.state);
+			//System.out.println(" ## state in "+myAgent.getLocalName() + ": "+this.state);
 			switch(this.state){
 				
 			case 0: 
@@ -53,7 +53,7 @@ public class BaseEquipmentBehaviour extends TickerBehaviour{
 			case 1:
 				block();
 				receiveProposal();
-				System.out.println("received: "+this.cfpResponsesReceived + " -> sent: "+this.cfpsSent);
+				//System.out.println("received: "+this.cfpResponsesReceived + " -> sent: "+this.cfpsSent);
 				if(this.cfpResponsesReceived == this.cfpsSent)
 					this.state++;
 				break;
@@ -61,7 +61,7 @@ public class BaseEquipmentBehaviour extends TickerBehaviour{
 			case 2:
 				if (sendProposalResponses())
 					this.state++;
-				else this.state = 0;
+				else this.state = -1;
 				break;
 			
 			case 3:
@@ -75,7 +75,8 @@ public class BaseEquipmentBehaviour extends TickerBehaviour{
 				
 			case 4:
 				//operator will have to press the button on the GUI to end treatment
-				((Equipment) myAgent).startBusyGui(); 
+				((Equipment) myAgent).startBusyGui();
+				myAgent.addBehaviour(new WaitForPatientStartBehaviour((Equipment) myAgent, bestProposalAID));
 				state = -1;
 				break;
 			}
@@ -85,7 +86,7 @@ public class BaseEquipmentBehaviour extends TickerBehaviour{
 
 	private void initiateContractNetProtocol(DFAgentDescription[] patients) {
 		System.out.println("Initiate contract net in " + myAgent.getLocalName());
-		System.out.println("number of patients = " + patients.length);
+		System.out.println("number of patients = " + patients.length + " -> they are: ");
 		
 		this.bestProposal = 0;
 		this.bestProposalAID = null;
@@ -99,7 +100,9 @@ public class BaseEquipmentBehaviour extends TickerBehaviour{
 		cfp.setReplyWith(replyWith); // Unique value
 		for(int i = 0; i < patients.length; i++){
 			cfp.addReceiver(patients[i].getName());
+			System.out.print(patients[i].getName().getLocalName()+",");
 		}
+		System.out.println("");
 		this.cfpsSent  = patients.length;
 		cfp.setContent(((Equipment) myAgent).getTreatment().getName());
 		myAgent.send(cfp);
@@ -111,6 +114,7 @@ public class BaseEquipmentBehaviour extends TickerBehaviour{
 		if (msg != null) {
 			
 			if (msg.getPerformative() == ACLMessage.PROPOSE){
+				System.out.println(myAgent.getLocalName() + " : received propose from " + msg.getSender().getLocalName());
 				int proposal = Integer.parseInt(msg.getContent());
 				if(proposal > this.bestProposal){
 					this.bestProposal = proposal;
@@ -119,7 +123,7 @@ public class BaseEquipmentBehaviour extends TickerBehaviour{
 				this.proposalsReceivedAIDs.add(msg.getSender());
 			}
 			//else performative -> ACLMessage.REFUSE
-	
+			else System.out.println(myAgent.getLocalName() + " : received refuse from " + msg.getSender().getLocalName());
 			this.cfpResponsesReceived++;
 		}/*
 		else {

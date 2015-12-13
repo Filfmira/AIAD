@@ -2,6 +2,8 @@ package hospital.gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.text.SimpleDateFormat;
+
 import javax.swing.*;
 
 import hospital.agents.Equipment;
@@ -12,19 +14,44 @@ public class EquipmentBusyGui extends JFrame {
 	
 	private Equipment myAgent;
 	
+	private int timeLeft = 10000;
+	private Timer timer;
+	private JButton finishButton;
 	
 	public EquipmentBusyGui(Equipment a) {
 		super(a.getLocalName());
-		
+		timeLeft = a.getTreatment().getTime()*1000;
 		myAgent = a;
 		
 		JPanel p = new JPanel();
-		p.setLayout(new BorderLayout());
+		p.setLayout(new GridLayout(3,1));
 		
 		JLabel l = new JLabel("Patient: "+this.myAgent.getCurrentPatient().getLocalName());
-		p.add(l, BorderLayout.NORTH);
+		p.add(l);
 		
-		JButton finishButton = new JButton("Finish "+this.myAgent.getTreatment().getName());
+		// Count down clock with treatment time
+		JLabel clockLabel = new JLabel();
+		
+		ActionListener countDown = new ActionListener()
+		{
+		    public void actionPerformed(ActionEvent e)
+		    {
+		        timeLeft -= 100;
+		        SimpleDateFormat df=new SimpleDateFormat("mm:ss:S");
+		        clockLabel.setText("Time left: "+df.format(timeLeft));
+		        if(timeLeft<=0)
+		        {
+		            timer.stop();
+		        }
+		    }
+		};
+		
+		this.timer = new Timer(100, countDown);
+		
+		p.add(clockLabel);
+		
+		// Button to finish the treatment
+		finishButton = new JButton("Finish "+this.myAgent.getTreatment().getName());
 		finishButton.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				try {
@@ -36,9 +63,11 @@ public class EquipmentBusyGui extends JFrame {
 			}
 		} );
 		finishButton.setPreferredSize(new Dimension(300,100));
-		p.add(finishButton, BorderLayout.SOUTH);
+		finishButton.setEnabled(false);
+		p.add(finishButton);
 
 		this.add(p);
+		
 		
 		// Make the agent terminate when the user closes 
 		// the GUI using the button on the upper right corner	
@@ -50,6 +79,12 @@ public class EquipmentBusyGui extends JFrame {
 		
 		setResizable(false);
 	}
+	
+	public void startTimer(){
+		this.timer.start();
+		finishButton.setEnabled(true);
+	}
+	
 	
 	public void showGui() {
 		pack();

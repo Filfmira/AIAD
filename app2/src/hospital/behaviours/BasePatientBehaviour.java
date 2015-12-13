@@ -18,7 +18,7 @@ public class BasePatientBehaviour extends Behaviour {
 	
 	@Override
 	public void action() {
-		System.out.println("state in "+myAgent.getLocalName() + ": "+this.state);
+		//System.out.println("state in "+myAgent.getLocalName() + ": "+this.state);
 		switch(this.state){
 		case 0: 
 			receiveCFPAndAnswer();
@@ -43,7 +43,7 @@ public class BasePatientBehaviour extends Behaviour {
 				// set in treatment
 				if(((Patient) myAgent).isInTreatment())
 					((Patient) myAgent).setNextTreatmentEquipment(msg.getSender());
-				else ((Patient) myAgent).setInTreatment(true);
+				else ((Patient) myAgent).setInTreatment(true, msg.getSender());
 				
 				// patient already has the equipment, so it 
 				// needs to deregister the "need for equipment" from de DF
@@ -72,7 +72,7 @@ public class BasePatientBehaviour extends Behaviour {
 					&& treatment.getName().equals(msg.getContent())
 					&& ((Patient) myAgent).getNextTreatmentEquipment() == null){
 				this.replyWith = msg.getReplyWith();
-				
+				System.out.println("Received CFP in "+this.myAgent.getLocalName() + " from: "+msg.getSender().getLocalName() + "gonna accept");
 				// send PROPOSAL
 				ACLMessage cfp = new ACLMessage(ACLMessage.PROPOSE);
 				cfp.setReplyWith(this.replyWith); // Unique value
@@ -84,6 +84,7 @@ public class BasePatientBehaviour extends Behaviour {
 				
 			}
 			else {
+				System.out.println("Received CFP in "+this.myAgent.getLocalName() + " from: "+msg.getSender().getLocalName() + "gonna refuse");
 				// send REFFUSE
 				ACLMessage cfp = new ACLMessage(ACLMessage.REFUSE);
 				cfp.setReplyWith(msg.getReplyWith()); // Unique value

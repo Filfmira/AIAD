@@ -7,7 +7,6 @@ import hospital.Treatment;
 import hospital.Treatments;
 import hospital.behaviours.BasePatientBehaviour;
 import hospital.behaviours.InTreatmentPatientBehaviour;
-import hospital.behaviours.InTreatmentPatientBehaviour;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
@@ -105,11 +104,11 @@ public class Patient extends Agent{
 	}
 	
 	
-	public void setInTreatment(boolean newIsInTreatment) {
+	public void setInTreatment(boolean newIsInTreatment, AID currentEquipment) {
 		this.isInTreatment = newIsInTreatment;		
 		if(newIsInTreatment){ //if setting to true
 			this.nextTreatmentIndex++;
-			this.addBehaviour(new InTreatmentPatientBehaviour(this)); 
+			this.addBehaviour(new InTreatmentPatientBehaviour(this,currentEquipment)); 
 		}
 		else if(this.nextTreatmentIndex == this.treatments.getTreatments().size()){ //if last treatment over, force next treatment
 			this.doDelete();

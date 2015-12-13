@@ -66,12 +66,23 @@ public class Equipment extends Agent{
 	}
 	
 	/**
+	 * called when patient starts treatment.
+	 * @return true if gui exists, false otherwise.
+	 */
+	public boolean startBusyGuiCountdown(){
+		if (this.busyGui == null)
+			return false;
+		this.busyGui.startTimer();
+		return true;
+	}
+	
+	/**
 	 * Method called at the end of a treatment. INFORM message will be sent to Patient agent,
 	 * informing that treatment has ended.
 	 */
 	public void finishTreatment() {
 		this.busyGui.dispose();
-		
+		this.busyGui = null;
 		ACLMessage end_treatment = new ACLMessage(ACLMessage.INFORM);
 		end_treatment.addReceiver(this.currentPatient);
 		end_treatment.setConversationId("treatment-ended");
