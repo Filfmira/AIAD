@@ -25,6 +25,9 @@ public class Patient extends Agent{
 	// while in treatment, if patient gets hold of equipment for 
 	// the next treatment, it stores that equipment's AID
 	private AID nextTreatmentEquipment = null; 
+	
+	private long currentTreatmentStartTime; //milis
+	private long currentTreatmentExpectedDuration; //seconds
 
 	@Override
 	protected void setup(){
@@ -103,12 +106,52 @@ public class Patient extends Agent{
 		}
 	}
 	
+	/**
+	 * 
+	 * @return this patient's proposal
+	 */
+	public double calculateNextTreatmentProposal(){
+		double factor = 1;
+		//System.out.println("next treatment time: "+this.getNextTreatment().getTime()*1000);
+		//System.out.println("curr treatment time left: "+this.getCurrentTreatmentExpectedTimeLeft());
+		if(this.getNextTreatment().getTime()*1000 < this.getCurrentTreatmentExpectedTimeLeft())
+			factor = factor*0.1;
+		
+		return this.priority*factor;
+	}
 	
+	
+	/**
+	 * time left for current treatment to end in milis
+	 * @return
+	 */
+	public long getCurrentTreatmentExpectedTimeLeft(){
+		return this.currentTreatmentExpectedDuration*1000 - 
+				(System.currentTimeMillis() - this.currentTreatmentStartTime);
+	}
+	
+	public long getCurrentTreatmentStartTime() {
+		return currentTreatmentStartTime;
+	}
+
+	public void setCurrentTreatmentStartTime(long l) {
+		this.currentTreatmentStartTime = l;
+	}
+
+	public long getCurrentTreatmentExpectedDuration() {
+		return currentTreatmentExpectedDuration;
+	}
+
+	public void setCurrentTreatmentExpectedDuration(int currentTreatmentExpectedDuration) {
+		this.currentTreatmentExpectedDuration = currentTreatmentExpectedDuration;
+	}
+
 	public void setInTreatment(boolean newIsInTreatment, AID currentEquipment) {
 		this.isInTreatment = newIsInTreatment;		
 		if(newIsInTreatment){ //if setting to true
 			this.nextTreatmentIndex++;
-			this.addBehaviour(new InTreatmentPatientBehaviour(this,currentEquipment)); 
+			this.currentTreatmentExpectedDuration = this.treatments.getTreatments().get(nextTreatmentIndex-1).getTime();
+			this.addBehaviour(new InTreatmentPatientBehaviour(this,currentEquipment)); 			
 		}
 		else if(this.nextTreatmentIndex == this.treatments.getTreatments().size()){ //if last treatment over, force next treatment
 			this.doDelete();

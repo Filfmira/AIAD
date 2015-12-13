@@ -66,10 +66,11 @@ public class BasePatientBehaviour extends Behaviour {
 		MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
 		ACLMessage msg = myAgent.receive(mt);
 		if (msg != null) {
-			Treatment treatment = ((Patient) myAgent).getNextTreatment();
+			Treatment nextTreatment = ((Patient) myAgent).getNextTreatment();
+			String msgContent = msg.getContent();
 			
-			if (treatment != null 
-					&& treatment.getName().equals(msg.getContent())
+			if (nextTreatment != null 
+					&& nextTreatment.getName().equals(msgContent)
 					&& ((Patient) myAgent).getNextTreatmentEquipment() == null){
 				this.replyWith = msg.getReplyWith();
 				System.out.println("Received CFP in "+this.myAgent.getLocalName() + " from: "+msg.getSender().getLocalName() + "gonna accept");
@@ -77,7 +78,7 @@ public class BasePatientBehaviour extends Behaviour {
 				ACLMessage cfp = new ACLMessage(ACLMessage.PROPOSE);
 				cfp.setReplyWith(this.replyWith); // Unique value
 				cfp.addReceiver(msg.getSender());
-				cfp.setContent(Integer.toString(((Patient) myAgent).getPriority()));
+				cfp.setContent(Double.toString(((Patient) myAgent).calculateNextTreatmentProposal()));
 				myAgent.send(cfp);
 				this.state++;
 				mt = MessageTemplate.MatchReplyWith(msg.getReplyWith());

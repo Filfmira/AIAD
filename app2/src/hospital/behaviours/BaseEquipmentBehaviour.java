@@ -17,7 +17,7 @@ public class BaseEquipmentBehaviour extends TickerBehaviour{
 	private String replyWith = null;
 	
 	private AID bestProposalAID = null;
-	private int bestProposal = 0;
+	private double bestProposal = 0;
 	private int cfpsSent = 0;
 	private int cfpResponsesReceived = 0;
 	private List<AID> proposalsReceivedAIDs = new ArrayList<AID>();
@@ -36,7 +36,7 @@ public class BaseEquipmentBehaviour extends TickerBehaviour{
 		this.state = 0;
 		//get patients that want this treatment
 		DFAgentDescription[] patients = ((Equipment) myAgent).getSubscribedPatients();
-		System.out.println(myAgent.getLocalName() + " -> number of patients before while = " + patients.length);
+		
 		long start = System.currentTimeMillis();
 		while(state != -1 && System.currentTimeMillis() - start < 5000){
 			//System.out.println(" ## state in "+myAgent.getLocalName() + ": "+this.state);
@@ -115,7 +115,7 @@ public class BaseEquipmentBehaviour extends TickerBehaviour{
 			
 			if (msg.getPerformative() == ACLMessage.PROPOSE){
 				System.out.println(myAgent.getLocalName() + " : received propose from " + msg.getSender().getLocalName());
-				int proposal = Integer.parseInt(msg.getContent());
+				double proposal = Double.parseDouble(msg.getContent());
 				if(proposal > this.bestProposal){
 					this.bestProposal = proposal;
 					this.bestProposalAID = msg.getSender();

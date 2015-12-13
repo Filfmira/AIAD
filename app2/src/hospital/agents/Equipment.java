@@ -18,6 +18,7 @@ public class Equipment extends Agent{
 	private AID currentPatient = null;
 	private EquipmentBusyGui busyGui = null;
 	
+	private long treatmentStartTime;
 	
 	// Put agent initializations here
 	@Override
@@ -73,6 +74,7 @@ public class Equipment extends Agent{
 		if (this.busyGui == null)
 			return false;
 		this.busyGui.startTimer();
+		this.treatmentStartTime = System.currentTimeMillis();
 		return true;
 	}
 	
@@ -81,6 +83,11 @@ public class Equipment extends Agent{
 	 * informing that treatment has ended.
 	 */
 	public void finishTreatment() {
+		// treatment duration will be modified acording to usual times in actual treatments.
+		long endTime = System.currentTimeMillis();
+		long duration = (endTime - this.treatmentStartTime)/1000;
+		Treatments.get(this.getTreatment().getName()).updateDuration(duration);
+		
 		this.busyGui.dispose();
 		this.busyGui = null;
 		ACLMessage end_treatment = new ACLMessage(ACLMessage.INFORM);

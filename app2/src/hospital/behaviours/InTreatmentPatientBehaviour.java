@@ -22,6 +22,7 @@ public class InTreatmentPatientBehaviour extends Behaviour{
 		startMsg.addReceiver(currentEquipment);
 		startMsg.setContent("start-treatment");
 		myAgent.send(startMsg);		
+		((Patient) myAgent).setCurrentTreatmentStartTime(System.currentTimeMillis());
 	}
 
 	@Override

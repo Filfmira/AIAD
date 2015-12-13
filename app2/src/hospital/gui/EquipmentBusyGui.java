@@ -14,7 +14,7 @@ public class EquipmentBusyGui extends JFrame {
 	
 	private Equipment myAgent;
 	
-	private int timeLeft = 10000;
+	private long timeLeft = 10000;
 	private Timer timer;
 	private JButton finishButton;
 	
