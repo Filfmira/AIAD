@@ -7,6 +7,7 @@ import hospital.agents.EquipmentAgent;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.TickerBehaviour;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -146,26 +147,26 @@ public class BaseEquipmentBehaviour extends TickerBehaviour {
 				this.proposalsReceivedAIDs.add(msg.getSender());
 				cfpResponsesReceived++;
 			}
-			System.out.println("received qq coisa nas proposes");
+			//System.out.println("received qq coisa nas proposes");
 		}
 		else {
-			System.out.println(" ## msg null??? "+myAgent.getLocalName());
+			//System.out.println(" ## msg null??? "+myAgent.getLocalName());
 			block();
 		}		
 	}
 
 	private void initiateContractNet() {
-		List<AID> patients = ((EquipmentAgent) myAgent).getSubscribedPatients();
+		DFAgentDescription[] patients = ((EquipmentAgent) myAgent).getSubscribedPatients();
 		ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
 		
 		replyWith = "cfp"+System.currentTimeMillis(); // Unique value
 		//mt = MessageTemplate.MatchInReplyTo(replyWith);
-		System.out.println("vou receber replyWith: #"+ this.replyWith+"#");
+		//System.out.println("vou receber replyWith: #"+ this.replyWith+"#");
 		cfp.setReplyWith(replyWith); // Unique value
-		for(int i = 0; i < patients.size(); i++){
-			cfp.addReceiver(patients.get(i));
+		for(int i = 0; i < patients.length; i++){
+			cfp.addReceiver(patients[i].getName());
 		}
-		this.proposalsSent = patients.size();
+		this.proposalsSent = patients.length;
 		cfp.setContent(((EquipmentAgent) myAgent).getTreatment().getName());
 		//cfp.setConversationId("auction-equipment-usage");
 		myAgent.send(cfp);
@@ -186,13 +187,13 @@ public class BaseEquipmentBehaviour extends TickerBehaviour {
 		state = 0;
 		while(state != -1){
 			
-			System.out.println("STATE: "+state+" -> "+myAgent.getName());
+			//System.out.println("STATE: "+state+" -> "+myAgent.getName());
 			
 			switch(this.state){
 			case 0:
 				if( ((EquipmentAgent) myAgent).getCurrentPatient() == null &&
-				((EquipmentAgent) myAgent).getSubscribedPatients().size() > 0){
-					System.out.println("  ## iniciando contract net "+myAgent.getLocalName());
+				((EquipmentAgent) myAgent).getSubscribedPatients().length > 0){
+					//System.out.println("  ## iniciando contract net "+myAgent.getLocalName());
 					initiateContractNet();
 					bestProposal = 0;
 					bestProposalAID = null;
@@ -209,7 +210,7 @@ public class BaseEquipmentBehaviour extends TickerBehaviour {
 						this.state = -1;
 					else this.state++;
 				}
-				else System.out.println("## not enough responses " + myAgent.getLocalName());
+				//else System.out.println("## not enough responses " + myAgent.getLocalName());
 				break;
 			case 2:
 				acceptedByPatient = false;

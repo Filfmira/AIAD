@@ -21,6 +21,7 @@ public class InTreatmentBehaviour extends Behaviour {
 				MessageTemplate.MatchConversationId("treatment-ended"));
 		ACLMessage msg = myAgent.receive(mt);
 		if (msg != null) {
+			
 			System.out.println("received ended treatment no patient");
 			if (((PatientAgent) myAgent).getNextTreatment() == null){
 				((PatientAgent) myAgent).setInTreatment(false);

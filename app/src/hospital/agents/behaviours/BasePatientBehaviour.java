@@ -50,10 +50,16 @@ public class BasePatientBehaviour extends Behaviour {
 				cfp.setReplyWith(msg.getReplyWith()); // Unique value
 				cfp.addReceiver(msg.getSender());
 				myAgent.send(cfp);
-				
+
+				// set in treatment
 				if(((PatientAgent) myAgent).isInTreatment())
 					((PatientAgent) myAgent).setNextTreatmentEquipment(msg.getSender());
 				else ((PatientAgent) myAgent).setInTreatment(true);
+				
+				// patient already has the equipment, so it 
+				// needs to deregister the "need for equipment" from de DF
+				String endedTreatment = ((PatientAgent) this.myAgent).getCurrentTreatment().getName();
+				((PatientAgent) this.myAgent).modifyRegisterDF();
 				
 				this.state = 0;
 			}
@@ -90,7 +96,7 @@ public class BasePatientBehaviour extends Behaviour {
 					this.state++;
 					mt = MessageTemplate.MatchReplyWith(msg.getReplyWith());
 					replyWith = msg.getReplyWith();
-					System.out.println(" ## sent propose to " + msg.getSender().getLocalName() + " reply with: #"+msg.getReplyWith()+"#");
+					//System.out.println(" ## sent propose to " + msg.getSender().getLocalName() + " reply with: #"+msg.getReplyWith()+"#");
 				}
 				else refuse = true;
 			}
@@ -103,7 +109,7 @@ public class BasePatientBehaviour extends Behaviour {
 				cfp.addReceiver(msg.getSender());
 				myAgent.send(cfp);
 				this.state = 0;
-				System.out.println(" ## sent refuse to " + msg.getSender().getLocalName());
+				//System.out.println(" ## sent refuse to " + msg.getSender().getLocalName());
 			}
 		}
 		else {

@@ -59,7 +59,7 @@ public class EquipmentAgent extends Agent{
 				fe.printStackTrace();
 			}
 			
-			addBehaviour(new SubscriptionHandlerBehaviour(this));
+			//addBehaviour(new SubscriptionHandlerBehaviour(this));
 			addBehaviour(new BaseEquipmentBehaviour(this));
 		}
 		else{
@@ -87,8 +87,24 @@ public class EquipmentAgent extends Agent{
 		this.subscribedPatients.remove(currentPatient);
 	}
 	
-	public List<AID> getSubscribedPatients() {
-		return subscribedPatients;
+	public DFAgentDescription[] getSubscribedPatients() {
+		//return subscribedPatients;
+		String treatmentRegisterName = this.treatment.getName()+"-patient";
+		System.out.println("vou procurar: "+treatmentRegisterName);
+		DFAgentDescription template = new DFAgentDescription();
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType(treatmentRegisterName);
+		template.addServices(sd);
+		try {
+			DFAgentDescription[] result = DFService.search(this, template);
+			return result;
+		}
+		catch(Exception e){
+			System.out.println("Problem getting subscribed agents....");
+			e.printStackTrace();
+		}
+		return null;
+			
 	}
 
 	public Treatment getTreatment() {
